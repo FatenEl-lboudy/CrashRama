@@ -182,6 +182,296 @@ namespace CrashRama
             }
         }
         //=---------------------------------------End------------------------------=
+        // start Breadth first search
+        /*private void changeAIcars(PictureBox tempCar)
+   {
+       Queue<int> imageQueue = new Queue<int>(); // Queue to hold the images to be explored
+       HashSet<int> explored = new HashSet<int>(); // Set to track explored images
+       int bestImageIndex = carImage; // Start with the current image as the best option
+       double bestScore = EvaluateCarImage(bestImageIndex); // Evaluate the current image
+
+       // Initialize BFS with the current image
+       imageQueue.Enqueue(carImage);
+       explored.Add(carImage);
+
+       while (imageQueue.Count > 0)
+       {
+           int currentImage = imageQueue.Dequeue();
+           List<int> neighbors = GetImageNeighbors(currentImage); // Get neighboring images
+
+           foreach (int neighbor in neighbors)
+           {
+               if (!explored.Contains(neighbor))
+               {
+                   explored.Add(neighbor);
+                   imageQueue.Enqueue(neighbor);
+
+                   double score = EvaluateCarImage(neighbor);
+                   if (score > bestScore) // Check if the neighbor is a better option
+                   {
+                       bestScore = score;
+                       bestImageIndex = neighbor;
+                   }
+               }
+           }
+       }
+
+       // Update the car image to the best found option
+       carImage = bestImageIndex;
+       UpdateCarImage(tempCar, carImage);
+       PositionCar(tempCar);
+   }
+
+   private List<int> GetImageNeighbors(int imageIndex)
+   {
+       // This function defines how to find neighboring images, which could be based on some logic
+       // Example: consider next and previous images as neighbors
+       List<int> neighbors = new List<int>();
+       if (imageIndex > 1) neighbors.Add(imageIndex - 1);
+       if (imageIndex < 9) neighbors.Add(imageIndex + 1);
+       return neighbors;
+   }
+
+   private double EvaluateCarImage(int imageIndex)
+   {
+       // Example evaluation function that scores each image
+       // This could be more complex depending on the game's needs
+       return imageIndex * 100; // Higher index might be considered better for simplicity
+   }
+
+   private void UpdateCarImage(PictureBox car, int imageIndex)
+   {
+       switch (imageIndex)
+       {
+           case 1: car.Image = Properties.Resources.ambulance; break;
+           case 2: car.Image = Properties.Resources.carGreen; break;
+           case 3: car.Image = Properties.Resources.carGrey; break;
+           // Continue for other cases
+           default: car.Image = Properties.Resources.carGrey; break;
+       }
+   }
+
+   private void PositionCar(PictureBox car)
+   {
+       car.Top = carPosition.Next(100, 400) * -1;
+       if ((string)car.Tag == "carLeft")
+       {
+           car.Left = carPosition.Next(5, 200);
+       }
+       else if ((string)car.Tag == "carRight")
+       {
+           car.Left = carPosition.Next(245, 422);
+       }
+   }*/
+        // End Breadth first search
+        // start Simulated Annealing Search
+        /*private void changeAIcars(PictureBox tempCar)
+{
+    int k = 3; // Number of states to keep track of
+    List<int> states = new List<int>(); // Current states (car images)
+    List<int> newStates = new List<int>(); // New proposed states
+
+    // Initialize with random states
+    for(int i = 0; i < k; i++)
+    {
+        states.Add(rand.Next(1, 10));
+    }
+
+    // Evaluate each state and generate successors
+    for(int i = 0; i < k; i++)
+    {
+        int newState = rand.Next(1, 10);
+        if (EvaluateState(newState) > EvaluateState(states[i]))
+        {
+            newStates.Add(newState);
+        }
+        else
+        {
+            newStates.Add(states[i]);
+        }
+    }
+
+    // Sort states by their evaluation and keep the best k
+    newStates.Sort((a, b) => EvaluateState(b).CompareTo(EvaluateState(a)));
+    newStates = newStates.Take(k).ToList();
+
+    // Choose the best new state
+    carImage = newStates.First();
+    UpdateCarImage(tempCar, carImage);
+
+    // Adjust position based on the car tag
+    tempCar.Top = carPosition.Next(100, 400) * -1;
+    if ((string)tempCar.Tag == "carLeft")
+    {
+        tempCar.Left = carPosition.Next(5, 200);
+    }
+    else if ((string)tempCar.Tag == "carRight")
+    {
+        tempCar.Left = carPosition.Next(245, 422);
+    }
+}
+
+private int EvaluateState(int imageIndex)
+{
+    // Example of a simple evaluation function
+    return imageIndex;  // Assuming higher index, better quality
+}
+
+private void UpdateCarImage(PictureBox car, int imageIndex)
+{
+    switch (imageIndex)
+    {
+        case 1: car.Image = Properties.Resources.ambulance; break;
+        case 2: car.Image = Properties.Resources.carGreen; break;
+        // Add other cases as above
+        default: car.Image = Properties.Resources.carGrey; break;
+    }
+}
+        */
+        // End Simulated Annealing Search
+        // start Iterative Deepening Search (IDS)
+        /*private void changeAIcars(PictureBox tempCar)
+{
+    int depth = 0;
+    bool found = false;
+    int targetImageIndex = 0;
+
+    while (!found)
+    {
+        found = DepthLimitedSearch(tempCar, depth, ref targetImageIndex);
+        depth++;
+    }
+
+    UpdateCarImage(tempCar, targetImageIndex);
+    PositionCar(tempCar);
+}
+
+private bool DepthLimitedSearch(PictureBox car, int limit, ref int bestImageIndex)
+{
+    int bestScore = -1;
+    for (int i = 1; i <= 9; i++)
+    {
+        int score = EvaluateCarImage(i);
+        if (score > bestScore && limit > 0)  // Check if this node is worth exploring
+        {
+            bestScore = score;
+            bestImageIndex = i;
+        }
+    }
+    return bestScore > 0;  // Return true if a valid image was found
+}
+
+private int EvaluateCarImage(int imageIndex)
+{
+    // Example scoring function for car images
+    return imageIndex * 100;  // Simulated scoring based on image index
+}
+
+private void UpdateCarImage(PictureBox car, int imageIndex)
+{
+    switch (imageIndex)
+    {
+        case 1: car.Image = Properties.Resources.ambulance; break;
+        case 2: car.Image = Properties.Resources.carGreen; break;
+        case 3: car.Image = Properties.Resources.carGrey; break;
+        // More cases as needed
+        default: car.Image = Properties.Resources.carGrey; break;
+    }
+}
+
+private void PositionCar(PictureBox car)
+{
+    car.Top = carPosition.Next(100, 400) * -1;
+    if ((string)car.Tag == "carLeft")
+    {
+        car.Left = carPosition.Next(5, 200);
+    }
+    else if ((string)car.Tag == "carRight")
+    {
+        car.Left = carPosition.Next(245, 422);
+    }
+}*/
+        // start Depth first search
+        /*private void changeAIcars(PictureBox tempCar)
+{
+    Stack<int> imageStack = new Stack<int>(); // Stack to hold images for DFS
+    HashSet<int> visited = new HashSet<int>(); // Set to track visited images
+    int bestImageIndex = carImage; // Start with the current image as the best option
+    double bestScore = EvaluateCarImage(bestImageIndex); // Evaluate the current image
+
+    // Start DFS with the current image
+    imageStack.Push(carImage);
+    visited.Add(carImage);
+
+    while (imageStack.Count > 0)
+    {
+        int currentImage = imageStack.Pop();
+        List<int> neighbors = GetImageNeighbors(currentImage); // Get neighboring images
+
+        foreach (int neighbor in neighbors)
+        {
+            if (!visited.Contains(neighbor))
+            {
+                visited.Add(neighbor);
+                imageStack.Push(neighbor);
+
+                double score = EvaluateCarImage(neighbor);
+                if (score > bestScore) // Check if the neighbor is a better option
+                {
+                    bestScore = score;
+                    bestImageIndex = neighbor;
+                }
+            }
+        }
+    }
+
+    // Update the car image to the best found option
+    carImage = bestImageIndex;
+    UpdateCarImage(tempCar, carImage);
+    PositionCar(tempCar);
+}
+
+private List<int> GetImageNeighbors(int imageIndex)
+{
+    // This function defines how to find neighboring images
+    // Example: consider next and previous images as neighbors
+    List<int> neighbors = new List<int>();
+    if (imageIndex > 1) neighbors.Add(imageIndex - 1);
+    if (imageIndex < 9) neighbors.Add(imageIndex + 1);
+    return neighbors;
+}
+
+private double EvaluateCarImage(int imageIndex)
+{
+    // Simple evaluation function to assign a score to each image
+    return imageIndex * 100; // Example: higher index might be considered better
+}
+
+private void UpdateCarImage(PictureBox car, int imageIndex)
+{
+    switch (imageIndex)
+    {
+        case 1: car.Image = Properties.Resources.ambulance; break;
+        case 2: car.Image = Properties.Resources.carGreen; break;
+        case 3: car.Image = Properties.Resources.carGrey; break;
+        // Complete for other images as needed
+        case 9: car.Image = Properties.Resources.TruckWhite; break;
+        default: car.Image = Properties.Resources.carGrey; break;
+    }
+}
+
+private void PositionCar(PictureBox car)
+{
+    car.Top = carPosition.Next(100, 400) * -1;
+    if ((string)car.Tag == "carLeft")
+    {
+        car.Left = carPosition.Next(5, 200);
+    }
+    else if ((string)car.Tag == "carRight")
+    {
+        car.Left = carPosition.Next(245, 422);
+    }
+}*/
 
         private void gameOver()
         {
